@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Orçamento de Casamento</title>
+<style>
+  :root{
+    --cream:#FAF6F0;
+    --paper:#FFFEFC;
+    --wine:#6E2A3D;
+    --wine-dark:#521F2E;
+    --gold:#B9974B;
+    --gold-light:#E7D6A8;
+    --sage:#8A9578;
+    --ink:#2E2620;
+    --ink-soft:#6B6058;
+    --line:#E5DCCE;
+    --danger:#B4433A;
+    --ok:#5C7A52;
+    --warn:#C08A2E;
+    --radius:14px;
+    --shadow:0 2px 10px rgba(110,42,61,0.08);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Work Sans', 'Segoe UI', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(70px + var(--safe-bottom));
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap');
+  h1,h2,h3, .display{font-family:'Playfair Display', serif;}
+
+  input, select, textarea{ font-size:16px; } /* evita zoom automático no iOS */
+
+  .wrap{max-width:560px; margin:0 auto; padding:16px 14px 40px;}
+
+  /* HERO */
+  header.hero{
+    position:relative;
+    padding:calc(20px + var(--safe-top)) 18px 22px;
+    margin:-16px -14px 16px;
+    background:linear-gradient(135deg, var(--wine) 0%, var(--wine-dark) 100%);
+    color:var(--gold-light);
+    overflow:hidden;
+    border-radius:0 0 22px 22px;
+  }
+  header.hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 90% 10%, rgba(233,214,168,0.14), transparent 40%),
+      radial-gradient(circle at 5% 95%, rgba(233,214,168,0.10), transparent 45%);
+  }
+  .hero-title{position:relative;}
+  .hero-title .eyebrow{
+    letter-spacing:.16em; text-transform:uppercase; font-size:10px; color:var(--gold);
+    margin:0 0 6px;
+  }
+  .hero-title h1{font-size:24px; margin:0; font-weight:600; color:#fff; line-height:1.2;}
+
+  .hero-names-row{display:flex; align-items:center; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .hero-names-row input{
+    flex:1; min-width:110px;
+    background:rgba(255,255,255,0.09);
+    border:1px solid rgba(233,214,168,0.35);
+    color:#fff; padding:9px 10px; border-radius:8px; font-family:inherit;
+  }
+  .hero-names-row input::placeholder{color:rgba(255,255,255,.5);}
+  .hero-names-row span{color:var(--gold-light); opacity:.7; font-size:13px;}
+
+  .hero-meta{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; position:relative;}
+  .hero-meta .full{grid-column:1 / -1;}
+  .hero-meta label{display:block; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-bottom:4px;}
+  .hero-meta input{
+    width:100%;
+    background:rgba(255,255,255,0.09); border:1px solid rgba(233,214,168,0.3);
+    color:#fff; padding:9px 10px; border-radius:8px; font-family:inherit;
+  }
+
+  .hero-progress{margin-top:18px; position:relative;}
+  .hero-progress-labels{display:flex; justify-content:space-between; align-items:baseline; font-size:11.5px; color:var(--gold-light); margin-bottom:7px; gap:8px;}
+  .hero-progress-labels b{color:#fff; font-size:14px; font-family:'Playfair Display',serif; font-weight:600;}
+  .bar-track{height:9px; background:rgba(255,255,255,0.15); border-radius:20px; overflow:hidden;}
+  .bar-fill{height:100%; background:linear-gradient(90deg, var(--gold) 0%, #E9D6A8 100%); border-radius:20px; transition:width .4s ease; width:0%;}
+
+  .hero-stats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; position:relative;}
+  .hero-stat{background:rgba(255,255,255,0.06); border-radius:10px; padding:9px 10px;}
+  .hero-stat b{display:block; font-family:'Playfair Display',serif; font-size:15px; color:#fff;}
+  .hero-stat span{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--gold-light);}
+
+  /* SUMMARY CARDS */
+  .cards{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;}
+  .card{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px 14px; box-shadow:var(--shadow);
+  }
+  .card .k{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft);}
+  .card .v{font-family:'Playfair Display',serif; font-size:17px; margin-top:5px; font-weight:600;}
+  .card.total .v{color:var(--wine);}
+  .card.paid .v{color:var(--ok);}
+  .card.pending .v{color:var(--warn);}
+  .card.remaining .v{color:var(--danger);}
+
+  /* CATEGORY BLOCKS */
+  .category{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    margin-bottom:14px; overflow:hidden; box-shadow:var(--shadow);
+  }
+  .cat-head{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:14px 14px; background:#FBF3E9; border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .cat-head-left{display:flex; align-items:center; gap:9px; min-width:0;}
+  .cat-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0;}
+  .cat-head h3{margin:0; font-size:15px; font-weight:600; word-break:break-word;}
+  .cat-sub{font-size:11px; color:var(--ink-soft); margin-top:2px;}
+  .cat-head-right{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+  .cat-totals-mini{font-size:11px; color:var(--ink-soft); text-align:right; line-height:1.5;}
+  .cat-totals-mini b{color:var(--ink); font-family:'Playfair Display',serif; font-size:13px; display:block;}
+  .chevron{transition:transform .2s ease; font-size:12px; color:var(--ink-soft);}
+  .category.collapsed .chevron{transform:rotate(-90deg);}
+  .category.collapsed .cat-body{display:none;}
+
+  .cat-del-btn{
+    border:none; background:none; color:var(--ink-soft); font-size:15px;
+    width:26px; height:26px; border-radius:50%; flex-shrink:0;
+  }
+  .cat-del-btn:active{background:#FBEAE8; color:var(--danger);}
+
+  /* ITEM CARDS (substitui tabela no mobile) */
+  .cat-body{padding:10px;}
+  .item-card{
+    background:#FCFAF6; border:1px solid #F0E9DC; border-radius:12px;
+    padding:12px; margin-bottom:10px; position:relative;
+  }
+  .item-card:last-child{margin-bottom:0;}
+  .item-top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px;}
+  .item-desc{
+    flex:1; font-weight:600; font-size:14.5px; border:none; background:transparent;
+    outline:none; font-family:inherit; padding:4px 0; border-bottom:1px dashed transparent;
+  }
+  .item-desc:focus{border-bottom:1px dashed var(--gold);}
+  .item-del{
+    border:none; background:none; color:var(--ink-soft); font-size:16px; flex-shrink:0;
+    width:28px; height:28px; border-radius:50%;
+  }
+  .item-del:active{background:#FBEAE8; color:var(--danger);}
+
+  .item-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .field{display:flex; flex-direction:column; gap:3px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft);}
+  .field input, .field select{
+    border:1px solid var(--line); border-radius:8px; padding:8px 9px; font-family:inherit;
+    background:#fff; font-size:14px; width:100%;
+  }
+  .field input:focus, .field select:focus{border-color:var(--gold); outline:none;}
+  .field input.money{text-align:right; font-variant-numeric:tabular-nums;}
+
+  select.status{
+    border:1px solid var(--line); border-radius:8px; padding:8px 9px; font-size:13px;
+    font-family:inherit; background:#fff; color:var(--ink);
+  }
+  select.status.pago{background:#EAF1E7; border-color:var(--ok); color:var(--ok);}
+  select.status.parcial{background:#FBF0DC; border-color:var(--warn); color:var(--warn);}
+  select.status.pendente{background:#FBEAE8; border-color:var(--danger); color:var(--danger);}
+
+  .cat-foot{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:10px 4px 4px;
+  }
+  .add-row{
+    border:1px dashed var(--line); background:transparent; color:var(--wine);
+    font-family:inherit; font-size:13px; padding:9px 14px; border-radius:9px; flex-shrink:0;
+  }
+  .add-row:active{background:#FBF3E9; border-color:var(--gold);}
+  .cat-foot-total{font-size:11.5px; color:var(--ink-soft); text-align:right;}
+  .cat-foot-total b{color:var(--ink); font-family:'Playfair Display',serif; font-size:14px; display:block;}
+
+  /* TOOLBAR fixa embaixo */
+  .toolbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:20;
+    display:flex; gap:8px; padding:10px 12px calc(10px + var(--safe-bottom));
+    background:rgba(250,246,240,0.92); backdrop-filter:blur(8px);
+    border-top:1px solid var(--line);
+  }
+  .btn{
+    flex:1; font-family:inherit; font-size:12.5px; padding:11px 8px; border-radius:10px;
+    border:1px solid var(--line); background:#fff; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+  }
+  .btn:active{border-color:var(--gold); background:#FBF3E9;}
+  .btn .ic{font-size:16px;}
+  .btn.danger{color:var(--danger); border-color:#F0D3CF;}
+
+  .new-cat-bar{
+    display:flex; gap:8px; margin:6px 0 20px;
+  }
+  .new-cat-bar input{
+    flex:1; min-width:0; padding:11px 12px; border-radius:10px; border:1px solid var(--line);
+    font-family:inherit; background:var(--paper);
+  }
+  .new-cat-bar button{
+    background:var(--wine); color:#fff; border:none; border-radius:10px; padding:0 16px; font-family:inherit; font-size:13px; white-space:nowrap;
+  }
+
+  footer.note{
+    text-align:center; color:var(--ink-soft); font-size:11px; margin-top:16px; line-height:1.7; padding:0 8px;
+  }
+
+  @media print{
+    .toolbar, .add-row, .item-del, .cat-del-btn, .new-cat-bar{display:none !important;}
+    body{background:#fff; padding-bottom:0;}
+  }
+
+  ::-webkit-scrollbar{width:0; height:0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-title">
+      <p class="eyebrow">Planejamento financeiro</p>
+      <h1>Orçamento do<br>Casamento</h1>
+      <div class="hero-names-row">
+        <input id="noivo1" placeholder="Noivo(a) 1" oninput="saveState()">
+        <span>&amp;</span>
+        <input id="noivo2" placeholder="Noivo(a) 2" oninput="saveState()">
+      </div>
+    </div>
+
+    <div class="hero-meta">
+      <div>
+        <label>Data do casamento</label>
+        <input type="date" id="dataCasamento" oninput="saveState(); updateCountdown();">
+      </div>
+      <div>
+        <label>Convidados</label>
+        <input type="number" inputmode="numeric" id="numConvidados" placeholder="0" oninput="saveState()">
+      </div>
+      <div class="full">
+        <label>Orçamento total planejado</label>
+        <input type="number" inputmode="decimal" id="orcamentoTotal" placeholder="0,00" oninput="saveState(); render();">
+      </div>
+    </div>
+
+    <div class="hero-progress">
+      <div class="hero-progress-labels">
+        <span id="countdownLabel">—</span>
+        <span><b id="pctGasto">0%</b> pago</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b id="statPago">R$ 0,00</b><span>Pago</span></div>
+        <div class="hero-stat"><b id="statFalta">R$ 0,00</b><span>Falta pagar</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="cards" id="summaryCards"></div>
+
+  <div id="categories"></div>
+
+  <div class="new-cat-bar">
+    <input type="text" id="novaCategoriaNome" placeholder="Nova categoria...">
+    <button onclick="addCategory()">+ Adicionar</button>
+  </div>
+
+  <footer class="note">
+    Os dados ficam salvos automaticamente neste navegador.<br>
+    Toque em qualquer campo para editar.
+  </footer>
+</div>
+
+<div class="toolbar">
+  <button class="btn" onclick="expandAll()"><span class="ic">↕️</span>Expandir</button>
+  <button class="btn" onclick="exportCSV()"><span class="ic">⬇️</span>Exportar CSV</button>
+  <button class="btn" onclick="window.print()"><span class="ic">🖨️</span>Imprimir</button>
+  <button class="btn danger" onclick="resetAll()"><span class="ic">🗑️</span>Limpar</button>
+</div>
+
+<script>
+/* ---------- Estado ---------- */
+const STORAGE_KEY = 'orcamento_casamento_v1';
+const COLORS = ['#6E2A3D','#B9974B','#8A9578','#5C7A52','#C08A2E','#B4433A','#7A5C8E','#3E6E7A'];
+
+let state = null;
+
+const DEFAULT_STATE = () => ({
+  noivo1:'', noivo2:'', dataCasamento:'', numConvidados:'', orcamentoTotal:'',
+  categorias: [
+    cat('Espaço / Aluguel de local', [
+      item('Aluguel do espaço / salão','','', '', 'Pendente'),
+      item('Taxa de decoração do local','','', '', 'Pendente'),
+    ]),
+    cat('Buffet / Alimentação', [
+      item('Buffet completo (por convidado)','','', '', 'Pendente'),
+      item('Bebidas / bar','','', '', 'Pendente'),
+      item('Bolo e doces','','', '', 'Pendente'),
+    ]),
+    cat('Mesas, Cadeiras e Estrutura', [
+      item('Locação de mesas e cadeiras','','', '', 'Pendente'),
+      item('Toalhas e sousplats','','', '', 'Pendente'),
+      item('Tenda / estrutura de apoio','','', '', 'Pendente'),
+    ]),
+    cat('Decoração e Flores', [
+      item('Decoração geral / cenografia','','', '', 'Pendente'),
+      item('Arranjos florais','','', '', 'Pendente'),
+    ]),
+    cat('Fotografia e Vídeo', [
+      item('Pacote fotografia','','', '', 'Pendente'),
+      item('Filmagem / videomaker','','', '', 'Pendente'),
+    ]),
+    cat('Música e Entretenimento', [
+      item('DJ / banda','','', '', 'Pendente'),
+    ]),
+    cat('Trajes e Beleza', [
+      item('Vestido da noiva','','', '', 'Pendente'),
+      item('Traje do noivo','','', '', 'Pendente'),
+      item('Cabelo e maquiagem','','', '', 'Pendente'),
+    ]),
+    cat('Convites e Papelaria', [
+      item('Convites','','', '', 'Pendente'),
+    ]),
+    cat('Outros', [
+      item('Lembrancinhas','','', '', 'Pendente'),
+      item('Celebrante / cerimonial','','', '', 'Pendente'),
+    ]),
+  ]
+});
+
+function uid(){ return 'id'+Math.random().toString(36).slice(2,10); }
+function cat(nome, itens){ return { id:uid(), nome, collapsed:true, itens }; }
+function item(descricao, fornecedor, dataPrevista, orcado, status){
+  return { id:uid(), descricao, fornecedor, dataPrevista: dataPrevista||'', orcado: orcado||'', pago:'', status: status||'Pendente' };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return DEFAULT_STATE();
+}
+function saveState(){
+  if(document.getElementById('noivo1')){
+    state.noivo1 = document.getElementById('noivo1').value;
+    state.noivo2 = document.getElementById('noivo2').value;
+    state.dataCasamento = document.getElementById('dataCasamento').value;
+    state.numConvidados = document.getElementById('numConvidados').value;
+    state.orcamentoTotal = document.getElementById('orcamentoTotal').value;
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function money(n){
+  n = parseFloat(n)||0;
+  return n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+}
+function num(v){ return parseFloat(String(v).replace(',','.'))||0; }
+
+/* ---------- Render ---------- */
+function render(){
+  renderHeaderFields();
+  renderCards();
+  renderCategories();
+  updateCountdown();
+}
+
+function renderHeaderFields(){
+  document.getElementById('noivo1').value = state.noivo1||'';
+  document.getElementById('noivo2').value = state.noivo2||'';
+  document.getElementById('dataCasamento').value = state.dataCasamento||'';
+  document.getElementById('numConvidados').value = state.numConvidados||'';
+  document.getElementById('orcamentoTotal').value = state.orcamentoTotal||'';
+}
+
+function totals(){
+  let orcado=0, pago=0;
+  state.categorias.forEach(c=>{
+    c.itens.forEach(it=>{
+      orcado += num(it.orcado);
+      pago += num(it.pago);
+    });
+  });
+  const orcamentoTotal = num(state.orcamentoTotal);
+  return { orcado, pago, falta: orcado-pago, saldo: orcamentoTotal-pago, orcamentoTotal };
+}
+
+function renderCards(){
+  const t = totals();
+  const pct = t.orcamentoTotal>0 ? Math.min(100, (t.pago/t.orcamentoTotal)*100) : 0;
+  document.getElementById('barFill').style.width = pct.toFixed(1)+'%';
+  document.getElementById('pctGasto').textContent = pct.toFixed(0)+'%';
+  document.getElementById('statPago').textContent = money(t.pago);
+  document.getElementById('statFalta').textContent = money(t.falta);
+
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="card total"><div class="k">Orçamento total</div><div class="v">${money(t.orcamentoTotal)}</div></div>
+    <div class="card"><div class="k">Orçado (itens)</div><div class="v">${money(t.orcado)}</div></div>
+    <div class="card paid"><div class="k">Total pago</div><div class="v">${money(t.pago)}</div></div>
+    <div class="card remaining"><div class="k">Saldo do orçamento</div><div class="v">${money(t.saldo)}</div></div>
+  `;
+}
+
+function updateCountdown(){
+  const el = document.getElementById('countdownLabel');
+  if(!state.dataCasamento){ el.textContent='Defina a data'; return; }
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const data = new Date(state.dataCasamento+'T00:00:00');
+  const diff = Math.round((data-hoje)/(1000*60*60*24));
+  if(diff>0) el.textContent = `Faltam ${diff} dia${diff===1?'':'s'}`;
+  else if(diff===0) el.textContent = 'É hoje! 💍';
+  else el.textContent = `Há ${Math.abs(diff)} dia${Math.abs(diff)===1?'':'s'}`;
+}
+
+function statusClass(s){
+  if(s==='Pago') return 'pago';
+  if(s==='Pago parcial') return 'parcial';
+  return 'pendente';
+}
+
+function renderCategories(){
+  const wrap = document.getElementById('categories');
+  wrap.innerHTML = '';
+  state.categorias.forEach((c, ci)=>{
+    const color = COLORS[ci % COLORS.length];
+    let orcadoCat=0, pagoCat=0;
+    c.itens.forEach(it=>{ orcadoCat+=num(it.orcado); pagoCat+=num(it.pago); });
+
+    const section = document.createElement('div');
+    section.className = 'category' + (c.collapsed? ' collapsed':'');
+    section.innerHTML = `
+      <div class="cat-head" onclick="toggleCollapse('${c.id}')">
+        <div class="cat-head-left">
+          <span class="cat-dot" style="background:${color}"></span>
+          <div style="min-width:0;">
+            <h3 contenteditable="true" onclick="event.stopPropagation()" onblur="renameCategory('${c.id}', this.textContent)">${escapeHtml(c.nome)}</h3>
+            <div class="cat-sub">${c.itens.length} item${c.itens.length===1?'':'s'}</div>
+          </div>
+        </div>
+        <div class="cat-head-right">
+          <div class="cat-totals-mini">Pago<b>${money(pagoCat)}</b></div>
+          <button class="cat-del-btn" title="Excluir categoria" onclick="event.stopPropagation(); deleteCategory('${c.id}')">✕</button>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="cat-body">
+        ${c.itens.map(it=>itemCardHtml(c.id, it)).join('')}
+        <div class="cat-foot">
+          <button class="add-row" onclick="addItem('${c.id}')">+ Item</button>
+          <div class="cat-foot-total">Restante<b>${money(orcadoCat-pagoCat)}</b></div>
+        </div>
+      </div>
+    `;
+    wrap.appendChild(section);
+  });
+}
+
+function itemCardHtml(catId, it){
+  return `
+    <div class="item-card" data-item="${it.id}">
+      <div class="item-top">
+        <input class="item-desc" value="${escapeAttr(it.descricao)}" placeholder="Descrição do item"
+          oninput="updateItem('${catId}','${it.id}','descricao', this.value)">
+        <button class="item-del" onclick="deleteItem('${catId}','${it.id}')" title="Excluir item">✕</button>
+      </div>
+      <div class="item-grid">
+        <div class="field">
+          <label>Fornecedor</label>
+          <input value="${escapeAttr(it.fornecedor)}" placeholder="Nome" oninput="updateItem('${catId}','${it.id}','fornecedor', this.value)">
+        </div>
+        <div class="field">
+          <label>Data prevista</label>
+          <input value="${escapeAttr(it.dataPrevista)}" placeholder="dd/mm/aaaa" oninput="updateItem('${catId}','${it.id}','dataPrevista', this.value)">
+        </div>
+        <div class="field">
+          <label>Valor orçado</label>
+          <input class="money" inputmode="decimal" value="${escapeAttr(it.orcado)}" placeholder="0,00" oninput="updateItem('${catId}','${it.id}','orcado', this.value)">
+        </div>
+        <div class="field">
+          <label>Valor pago</label>
+          <input class="money" inputmode="decimal" value="${escapeAttr(it.pago)}" placeholder="0,00" oninput="updateItem('${catId}','${it.id}','pago', this.value)">
+        </div>
+        <div class="field full">
+          <label>Status</label>
+          <select class="status ${statusClass(it.status)}" onchange="updateItem('${catId}','${it.id}','status', this.value); this.className='status '+ (this.value==='Pago'?'pago':this.value==='Pago parcial'?'parcial':'pendente')">
+            <option ${it.status==='Pendente'?'selected':''}>Pendente</option>
+            <option ${it.status==='Pago parcial'?'selected':''}>Pago parcial</option>
+            <option ${it.status==='Pago'?'selected':''}>Pago</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(v){
+  return (v==null?'':String(v)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escapeAttr(v){
+  return (v==null?'':String(v)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ---------- Ações ---------- */
+function toggleCollapse(catId){
+  const c = state.categorias.find(c=>c.id===catId);
+  c.collapsed = !c.collapsed;
+  saveState(); renderCategories();
+}
+function expandAll(){
+  const anyCollapsed = state.categorias.some(c=>c.collapsed);
+  state.categorias.forEach(c=>c.collapsed = !anyCollapsed);
+  saveState(); renderCategories();
+}
+function renameCategory(catId, name){
+  const c = state.categorias.find(c=>c.id===catId);
+  c.nome = name.trim() || c.nome;
+  saveState(); renderCategories();
+}
+function deleteCategory(catId){
+  if(!confirm('Excluir esta categoria e todos os itens dela?')) return;
+  state.categorias = state.categorias.filter(c=>c.id!==catId);
+  saveState(); render();
+}
+function addCategory(){
+  const input = document.getElementById('novaCategoriaNome');
+  const nome = input.value.trim();
+  if(!nome) return;
+  state.categorias.push(cat(nome, [item('Novo item','','','','Pendente')]));
+  state.categorias[state.categorias.length-1].collapsed = false;
+  input.value = '';
+  saveState(); render();
+}
+function addItem(catId){
+  const c = state.categorias.find(c=>c.id===catId);
+  c.itens.push(item('Novo item','','','','Pendente'));
+  saveState(); renderCategories();
+}
+function deleteItem(catId, itemId){
+  const c = state.categorias.find(c=>c.id===catId);
+  c.itens = c.itens.filter(it=>it.id!==itemId);
+  saveState(); render();
+}
+function updateItem(catId, itemId, field, value){
+  const c = state.categorias.find(c=>c.id===catId);
+  const it = c.itens.find(it=>it.id===itemId);
+  it[field] = value;
+  saveState();
+  if(field==='orcado' || field==='pago'){ renderCards(); renderCatFootAndTotals(); }
+}
+function renderCatFootAndTotals(){
+  document.querySelectorAll('.category').forEach((section, ci)=>{
+    const c = state.categorias[ci];
+    if(!c) return;
+    let orcadoCat=0, pagoCat=0;
+    c.itens.forEach(it=>{ orcadoCat+=num(it.orcado); pagoCat+=num(it.pago); });
+    const mini = section.querySelector('.cat-totals-mini b');
+    if(mini) mini.textContent = money(pagoCat);
+    const foot = section.querySelector('.cat-foot-total b');
+    if(foot) foot.textContent = money(orcadoCat-pagoCat);
+  });
+}
+function resetAll(){
+  if(!confirm('Isso vai apagar todos os dados salvos e restaurar o modelo padrão. Deseja continuar?')) return;
+  state = DEFAULT_STATE();
+  saveState(); render();
+}
+
+function exportCSV(){
+  let rows = [['Categoria','Item','Fornecedor','Data prevista','Valor orçado','Valor pago','Status']];
+  state.categorias.forEach(c=>{
+    c.itens.forEach(it=>{
+      rows.push([c.nome, it.descricao, it.fornecedor, it.dataPrevista, it.orcado, it.pago, it.status]);
+    });
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(';')).join('\n');
+  const blob = new Blob(["\ufeff"+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'orcamento-casamento.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- Init ---------- */
+state = loadState();
+render();
+</script>
+</body>
+</html>
